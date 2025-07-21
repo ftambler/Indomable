@@ -1,7 +1,9 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <math.h>
+#include <string.h>
 #include "raylib.h"
+#include "cJSON.h"
 
 // Screen Config
 static const int screenWidth = 1200;
@@ -25,18 +27,30 @@ typedef struct {
     float moveSpeed;
 } Player;
 static Player player;
-
 Texture2D playerSprite;
 
-typedef struct Object {
-    Vector2 position;
+typedef struct {
     bool hasCollision;
     int textureId;
     int size;
 } Object;
-const int totalObjects = 1;
-Object gameObjects[1];
 
+typedef enum { OBJECT } Type;
+typedef struct {
+    Vector2 position;
+    Type type;
+    union {
+        Object object;
+    };
+} GameObject;
+
+typedef struct {
+    int objectCount;
+    GameObject* objects;
+} Level;
+Level* levelArray;
+GameObject* roomObjects;
+int currentLevel = 0;
 
 // Physics
 static float gravity = 10;
@@ -52,13 +66,62 @@ static void DeInitialize(void);
 static bool checkCollision(Vector2 obj1, int size1, Vector2 obj2, int size2);
 static void handlePlayerCollision(Vector2 *playerPos, Vector2 *playerVel, int playerSize, bool *grounded, Vector2 obj, int objSize);
 
+static int getEnumOfValue(char* value);
+
 //DEBUG
 static void printPlayerPosition(void);
 static void printPlayerVelocity(void);
 
+int loadLevel() {
+    FILE *fp = fopen("assets/levels/level1.json", "r");
+    if (fp == NULL) {
+        printf("Error: Unable to open the file.\n");
+        return 1;
+    }
+
+    // read the file contents into a string
+    char buffer[1024];
+    int len = fread(buffer, 1, sizeof(buffer), fp);
+    fclose(fp);
+
+    cJSON* root = cJSON_Parse(buffer);
+    cJSON* levels = cJSON_GetObjectItem(root, "Level");
+    int level_count = cJSON_GetArraySize(levels);
+
+    levelArray = malloc(level_count * sizeof(Level));
+
+    for (int i = 0; i < level_count; i++) {
+        cJSON* level_entry = cJSON_GetArrayItem(levels, i);
+        cJSON* level_key = level_entry->child;
+        cJSON* obj_array = cJSON_GetObjectItem(level_entry, level_key->string);
+
+        int objCount = cJSON_GetArraySize(obj_array);
+        levelArray[i].objectCount = objCount;
+        levelArray[i].objects = malloc(objCount * sizeof(GameObject));
+
+        for (int j = 0; j < objCount; j++) {
+            cJSON* obj = cJSON_GetArrayItem(obj_array, j);
+            cJSON* type = cJSON_GetObjectItem(obj, "type");
+            cJSON* pos = cJSON_GetObjectItem(obj, "position");
+
+            levelArray[i].objects[j].type = getEnumOfValue(type->valuestring);
+
+            levelArray[i].objects[j].position.x = cJSON_GetObjectItem(pos, "x")->valueint;
+            levelArray[i].objects[j].position.y = cJSON_GetObjectItem(pos, "y")->valueint;
+        }
+    }
+}
+
+int getEnumOfValue(char* value) {
+    if(value == "OBJECT") return 0;
+    return 0;
+}
+
 int main(void) {
     InitWindow(screenWidth, screenHeight, "Juego Epicardo");
     SetTargetFPS(60);
+
+    loadLevel();
 
     InitGame();
 
@@ -83,12 +146,11 @@ void InitGame() {
     
     playerSprite = LoadTexture("assets/textures/player.png");
 
-    gameObjects[0].position.x = 5;
-    gameObjects[0].position.y = 31;
-    gameObjects[0].size = 20;
+    roomObjects = levelArray[0].objects;
 }
 void DeInitialize() {
     UnloadTexture(playerSprite);
+    free(levelArray);
 }
 
 void UpdateDrawFrame(void) {
@@ -118,9 +180,9 @@ void UpdateGame(float deltaTime) {
         player.velocity.y = 0;
         player.isGrounded = true;
     }
-    for(int i = 0; i < totalObjects; i++) {
-        if(checkCollision(player.position, player.size, gameObjects[i].position, gameObjects[i].size)) {
-            handlePlayerCollision(&player.position, &player.velocity, player.size, &player.isGrounded, gameObjects[i].position, tileSize);
+    for(int i = 0; i < levelArray[currentLevel].objectCount; i++) {
+        if(checkCollision(player.position, player.size, roomObjects[i].position, tileSize)) {
+            handlePlayerCollision(&player.position, &player.velocity, player.size, &player.isGrounded, roomObjects[i].position, tileSize);
         }
     }
 
@@ -162,6 +224,20 @@ void handlePlayerCollision(Vector2 *playerPos, Vector2 *playerVel, int playerSiz
     }
 }
 
+void DrawGame(void) {
+    BeginDrawing();
+    
+    ClearBackground(RAYWHITE);
+    
+    for(int i = 0; i < levelArray->objectCount; i++) {
+        DrawRectangle(roomObjects[i].position.x * tileSize, roomObjects[i].position.y * tileSize, tileSize, tileSize, BLACK);
+    }
+
+    DrawTexture(playerSprite, player.position.x, player.position.y, WHITE);
+
+    EndDrawing();
+}
+
 
 void printPlayerPosition(void) {
     printf("x: %f, y: %f \n", player.position.x, player.position.y);
@@ -169,18 +245,4 @@ void printPlayerPosition(void) {
 
 void printPlayerVelocity(void) {
     printf("x: %f, y: %f \n", player.velocity.x, player.velocity.y);
-}
-
-void DrawGame(void) {
-    BeginDrawing();
-    
-    ClearBackground(RAYWHITE);
-    
-    for(int i = 0; i < 1; i++) {
-        DrawRectangle(gameObjects[i].position.x*tileSize, gameObjects[i].position.y*tileSize, tileSize, tileSize, BLACK);
-    }
-
-    DrawTexture(playerSprite, player.position.x, player.position.y, WHITE);
-
-    EndDrawing();
 }
