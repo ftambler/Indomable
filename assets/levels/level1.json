@@ -2,10 +2,11 @@
   "Level" : [
     {
         "0" : [
-            {"type": "object", "position": { "x": 5, "y": 31 }},
-            {"type": "object", "position": { "x": 3, "y": 28 }},
-            {"type": "object", "position": { "x": 1, "y": 25 }},
-            {"type": "object", "position": { "x": 3, "y": 22 }}
+            {"type": "spawn", "position": { "x": 20, "y": 28 }},
+            {"type": "object", "position": { "x": 5, "y": 31 }, "tileId" : 0},
+            {"type": "object", "position": { "x": 3, "y": 28 }, "tileId" : 0},
+            {"type": "object", "position": { "x": 1, "y": 25 }, "tileId" : 0},
+            {"type": "object", "position": { "x": 3, "y": 22 }, "tileId" : 0}
         ]
     },
     {
