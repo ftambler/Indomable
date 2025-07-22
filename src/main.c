@@ -28,10 +28,13 @@ typedef struct {
 } Player;
 static Player player;
 Texture2D playerSprite;
+Texture2D grassSprite;
 
+
+typedef enum { GRASS } TextureId;
 typedef struct {
     bool hasCollision;
-    int textureId;
+    TextureId textureId;
     int size;
 } Object;
 
@@ -63,10 +66,10 @@ static void DrawGame(void);
 static void InitGame(void);
 static void DeInitialize(void);
 
-static bool checkCollision(Vector2 obj1, int size1, Vector2 obj2, int size2);
+static bool checkSqSqCollision(Vector2 obj1, int size1, Vector2 obj2, int size2);
 static void handlePlayerCollision(Vector2 *playerPos, Vector2 *playerVel, int playerSize, bool *grounded, Vector2 obj, int objSize);
 
-static int getEnumOfValue(char* value);
+static int getEnumOfType(char* value);
 
 //DEBUG
 static void printPlayerPosition(void);
@@ -104,7 +107,14 @@ int loadLevel() {
             cJSON* type = cJSON_GetObjectItem(obj, "type");
             cJSON* pos = cJSON_GetObjectItem(obj, "position");
 
-            levelArray[i].objects[j].type = getEnumOfValue(type->valuestring);
+            levelArray[i].objects[j].type = getEnumOfType(type->valuestring);
+            switch (levelArray[i].objects[j].type){
+            case OBJECT:
+                levelArray[i].objects[j].object.textureId = 0;
+                break;
+            default:
+                break;
+            }
 
             levelArray[i].objects[j].position.x = cJSON_GetObjectItem(pos, "x")->valueint;
             levelArray[i].objects[j].position.y = cJSON_GetObjectItem(pos, "y")->valueint;
@@ -112,7 +122,7 @@ int loadLevel() {
     }
 }
 
-int getEnumOfValue(char* value) {
+int getEnumOfType(char* value) {
     if(value == "OBJECT") return OBJECT;
     if(value == "SPAWN") return SPAWN;
     return -1;
@@ -140,12 +150,13 @@ void InitGame() {
     player.position = (Vector2){screenWidth/2, screenHeight/2};
     player.velocity = (Vector2){0, 0};
     
-    player.size = 20;
+    player.size = 32;
     player.isGrounded = true;
     player.moveSpeed = 5;
     player.jumpForce = 5;
     
     playerSprite = LoadTexture("assets/textures/player.png");
+    grassSprite = LoadTexture("assets/textures/grass.png");
 
     roomObjects = levelArray[0].objects;
 }
@@ -182,7 +193,7 @@ void UpdateGame(float deltaTime) {
         player.isGrounded = true;
     }
     for(int i = 0; i < levelArray[currentLevel].objectCount; i++) {
-        if(checkCollision(player.position, player.size, roomObjects[i].position, tileSize)) {
+        if(checkSqSqCollision(player.position, player.size, roomObjects[i].position, tileSize)) {
             handlePlayerCollision(&player.position, &player.velocity, player.size, &player.isGrounded, roomObjects[i].position, tileSize);
         }
     }
@@ -191,7 +202,7 @@ void UpdateGame(float deltaTime) {
     player.velocity.x *= groundFriction;
 }
 
-bool checkCollision(Vector2 obj1, int size1, Vector2 obj2, int size2) {
+bool checkSqSqCollision(Vector2 obj1, int size1, Vector2 obj2, int size2) {
     return !(obj1.x > obj2.x * tileSize + size2 ||
         obj1.x + size1 < obj2.x * tileSize ||
         obj1.y > obj2.y * tileSize + size2 ||
@@ -226,20 +237,40 @@ void handlePlayerCollision(Vector2 *playerPos, Vector2 *playerVel, int playerSiz
 }
 
 char level[8];
-
 void DrawGame(void) {
     BeginDrawing();
     
     ClearBackground(RAYWHITE);
     
     sprintf(level, "Level %d", currentLevel);
-    DrawText(level,0,0,20,BLACK);
+    DrawText(level, 0, 0, 20, BLACK);
 
     for(int i = 0; i < levelArray[currentLevel].objectCount; i++) {
-        DrawRectangle(roomObjects[i].position.x * tileSize, roomObjects[i].position.y * tileSize, tileSize, tileSize, BLACK);
+        // DrawRectangle(roomObjects[i].position.x * tileSize, roomObjects[i].position.y * tileSize, tileSize, tileSize, BLACK);
+        if(roomObjects[i].type != OBJECT) continue;
+
+        Texture2D drawTexture;
+        switch (roomObjects[i].object.textureId)
+        {
+        case GRASS:
+            drawTexture = grassSprite;
+            break;
+        
+        default:
+            drawTexture = grassSprite;
+            break;
+        }
+        
+        DrawTexturePro(grassSprite, (Rectangle){ 0.0f, 0.0f, grassSprite.height, grassSprite.width }, 
+            (Rectangle){ roomObjects[i].position.x * tileSize, roomObjects[i].position.y * tileSize, tileSize, tileSize }, 
+            (Vector2){0, 0}, 0.0f, WHITE);
+
     }
 
-    DrawTexture(playerSprite, player.position.x, player.position.y, WHITE);
+    // DrawTexture(playerSprite, player.position.x, player.position.y, WHITE);
+    DrawTexturePro(playerSprite, (Rectangle){ 0.0f, 0.0f, playerSprite.height, playerSprite.width }, 
+        (Rectangle){ player.position.x, player.position.y, player.size, player.size }, 
+        (Vector2){0, 0}, 0.0f, WHITE);
 
     EndDrawing();
 }
