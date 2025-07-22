@@ -4,6 +4,7 @@
 #include <string.h>
 #include "raylib.h"
 #include "cJSON.h"
+#include "prints.h"
 
 // Screen Config
 static const int screenWidth = 1200;
@@ -31,14 +32,14 @@ Texture2D playerSprite;
 Texture2D grassSprite;
 
 
-typedef enum { GRASS } TextureId;
+typedef enum { GRASS, DEFAULT } TextureId;
 typedef struct {
     bool hasCollision;
     TextureId textureId;
     int size;
 } Object;
 
-typedef enum { OBJECT, SPAWN } Type;
+typedef enum { OBJECT, SPAWN, NEXT, WIN } Type;
 typedef struct {
     Vector2 position;
     Type type;
@@ -54,6 +55,7 @@ typedef struct {
 Level* levelArray;
 GameObject* roomObjects;
 int currentLevel = 0;
+int level_count;
 
 // Physics
 static float gravity = 10;
@@ -70,10 +72,6 @@ static bool checkSqSqCollision(Vector2 obj1, int size1, Vector2 obj2, int size2)
 static void handlePlayerCollision(Vector2 *playerPos, Vector2 *playerVel, int playerSize, bool *grounded, Vector2 obj, int objSize);
 
 static int getEnumOfType(char* value);
-
-//DEBUG
-static void printPlayerPosition(void);
-static void printPlayerVelocity(void);
     
 int loadLevel() {
     FILE *fp = fopen("assets/levels/level1.json", "r");
@@ -82,14 +80,14 @@ int loadLevel() {
         return 1;
     }
 
-    // read the file contents into a string
+    // TODO DINAMIC BUFFER SIZE
     char buffer[1024];
     int len = fread(buffer, 1, sizeof(buffer), fp);
     fclose(fp);
 
     cJSON* root = cJSON_Parse(buffer);
     cJSON* levels = cJSON_GetObjectItem(root, "Level");
-    int level_count = cJSON_GetArraySize(levels);
+    level_count = cJSON_GetArraySize(levels);
 
     levelArray = malloc(level_count * sizeof(Level));
 
@@ -108,23 +106,29 @@ int loadLevel() {
             cJSON* pos = cJSON_GetObjectItem(obj, "position");
 
             levelArray[i].objects[j].type = getEnumOfType(type->valuestring);
-            switch (levelArray[i].objects[j].type){
-            case OBJECT:
-                levelArray[i].objects[j].object.textureId = 0;
-                break;
-            default:
-                break;
-            }
-
             levelArray[i].objects[j].position.x = cJSON_GetObjectItem(pos, "x")->valueint;
             levelArray[i].objects[j].position.y = cJSON_GetObjectItem(pos, "y")->valueint;
+            
+            if(levelArray[i].objects[j].type != OBJECT) continue;
+            switch (levelArray[i].objects[j].object.textureId){
+                case 0:
+                    levelArray[i].objects[j].object.textureId = GRASS;
+                    break;
+                default:
+                    levelArray[i].objects[j].object.textureId = DEFAULT;
+                    break;
+            }
+
         }
     }
+    return 0;
 }
 
 int getEnumOfType(char* value) {
-    if(value == "OBJECT") return OBJECT;
-    if(value == "SPAWN") return SPAWN;
+    if(strcmp(value, "OBJECT") == 0) return OBJECT;
+    if(strcmp(value, "SPAWN") == 0) return SPAWN;
+    if(strcmp(value, "NEXT") == 0) return NEXT;
+    if(strcmp(value, "WIN") == 0) return WIN;
     return -1;
 }
 
@@ -158,10 +162,12 @@ void InitGame() {
     playerSprite = LoadTexture("assets/textures/player.png");
     grassSprite = LoadTexture("assets/textures/grass.png");
 
-    roomObjects = levelArray[0].objects;
+    roomObjects = levelArray[currentLevel].objects;
 }
 void DeInitialize() {
     UnloadTexture(playerSprite);
+    UnloadTexture(grassSprite);
+    for(int i = 0; i < level_count; i++) free(levelArray[i].objects);
     free(levelArray);
 }
 
@@ -193,6 +199,7 @@ void UpdateGame(float deltaTime) {
         player.isGrounded = true;
     }
     for(int i = 0; i < levelArray[currentLevel].objectCount; i++) {
+        
         if(checkSqSqCollision(player.position, player.size, roomObjects[i].position, tileSize)) {
             handlePlayerCollision(&player.position, &player.velocity, player.size, &player.isGrounded, roomObjects[i].position, tileSize);
         }
@@ -237,7 +244,9 @@ void handlePlayerCollision(Vector2 *playerPos, Vector2 *playerVel, int playerSiz
 }
 
 char level[8];
+
 void DrawGame(void) {
+
     BeginDrawing();
     
     ClearBackground(RAYWHITE);
@@ -261,7 +270,7 @@ void DrawGame(void) {
             break;
         }
         
-        DrawTexturePro(grassSprite, (Rectangle){ 0.0f, 0.0f, grassSprite.height, grassSprite.width }, 
+        DrawTexturePro(drawTexture, (Rectangle){ 0.0f, 0.0f, grassSprite.height, grassSprite.width }, 
             (Rectangle){ roomObjects[i].position.x * tileSize, roomObjects[i].position.y * tileSize, tileSize, tileSize }, 
             (Vector2){0, 0}, 0.0f, WHITE);
 
@@ -273,13 +282,4 @@ void DrawGame(void) {
         (Vector2){0, 0}, 0.0f, WHITE);
 
     EndDrawing();
-}
-
-
-void printPlayerPosition(void) {
-    printf("x: %f, y: %f \n", player.position.x, player.position.y);
-}
-
-void printPlayerVelocity(void) {
-    printf("x: %f, y: %f \n", player.velocity.x, player.velocity.y);
 }
