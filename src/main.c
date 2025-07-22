@@ -35,7 +35,7 @@ typedef struct {
     int size;
 } Object;
 
-typedef enum { OBJECT } Type;
+typedef enum { OBJECT, SPAWN } Type;
 typedef struct {
     Vector2 position;
     Type type;
@@ -71,7 +71,7 @@ static int getEnumOfValue(char* value);
 //DEBUG
 static void printPlayerPosition(void);
 static void printPlayerVelocity(void);
-
+    
 int loadLevel() {
     FILE *fp = fopen("assets/levels/level1.json", "r");
     if (fp == NULL) {
@@ -113,8 +113,9 @@ int loadLevel() {
 }
 
 int getEnumOfValue(char* value) {
-    if(value == "OBJECT") return 0;
-    return 0;
+    if(value == "OBJECT") return OBJECT;
+    if(value == "SPAWN") return SPAWN;
+    return -1;
 }
 
 int main(void) {
@@ -224,12 +225,17 @@ void handlePlayerCollision(Vector2 *playerPos, Vector2 *playerVel, int playerSiz
     }
 }
 
+char level[8];
+
 void DrawGame(void) {
     BeginDrawing();
     
     ClearBackground(RAYWHITE);
     
-    for(int i = 0; i < levelArray->objectCount; i++) {
+    sprintf(level, "Level %d", currentLevel);
+    DrawText(level,0,0,20,BLACK);
+
+    for(int i = 0; i < levelArray[currentLevel].objectCount; i++) {
         DrawRectangle(roomObjects[i].position.x * tileSize, roomObjects[i].position.y * tileSize, tileSize, tileSize, BLACK);
     }
 
