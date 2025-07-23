@@ -4,7 +4,8 @@ CFLAGS = -Iinclude/utils -Ilib/raylib/include -Ilib/cJSON -Isrc/utils -Wall -Wex
 LDFLAGS = -Llib/raylib/lib -lraylib -lopengl32 -lgdi32 -lwinmm
 
 # Source files
-SRC = src/main.c lib/cJSON/cJSON.c src/utils/prints.c
+# SRC = src/main.c lib/cJSON/cJSON.c src/utils/prints.c
+SRC := $(wildcard src/*.c src/utils/*.c lib/cJSON/*.c)
 OBJ = $(SRC:.c=.o)
 
 # Output executable
