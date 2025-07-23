@@ -1,11 +1,11 @@
 # Compiler and flags
 CC = gcc
-CFLAGS = -Iinclude/utils -Ilib/raylib/include -Ilib/cJSON -Isrc/utils -Wall -Wextra -g
+CFLAGS = -Iinclude/core -Iinclude/entities -Iinclude/systems -Iinclude/utils -Ilib/raylib/include -Ilib/cJSON -Isrc/utils -Wall -Wextra -g
 LDFLAGS = -Llib/raylib/lib -lraylib -lopengl32 -lgdi32 -lwinmm
 
 # Source files
 # SRC = src/main.c lib/cJSON/cJSON.c src/utils/prints.c
-SRC := $(wildcard src/*.c src/utils/*.c lib/cJSON/*.c)
+SRC := $(wildcard src/*.c src/core/*.c src/entities/*.c src/systems/*.c src/utils/*.c lib/cJSON/*.c)
 OBJ = $(SRC:.c=.o)
 
 # Output executable
