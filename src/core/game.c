@@ -21,6 +21,7 @@ Player player;
 static const int MOVE_LEFT = KEY_LEFT;
 static const int MOVE_RIGHT = KEY_RIGHT;
 static const int JUMP = KEY_UP;
+static const int RESET = KEY_R;
 // static const int PAUSE = KEY_P;
 
 // Texture
@@ -31,7 +32,7 @@ void initGame() {
     loadTextures();
     loadLevel(&level_count, &levelArray);
         
-    InitPlayer(&player);
+    initPlayer(&player);
 
     roomObjects = levelArray[currentLevel].objects;
 }
@@ -51,9 +52,10 @@ void loadTextures() {
 
 void updateGame(float deltaTime) {
     // Input
-    if (IsKeyDown(MOVE_RIGHT)) player.velocity.x += player.moveSpeed;
-    if (IsKeyDown(MOVE_LEFT))  player.velocity.x -= player.moveSpeed;
-    if (IsKeyPressed(JUMP) && player.isGrounded) {
+    if(IsKeyDown(RESET)) player.isAlive = false;
+    if(IsKeyDown(MOVE_RIGHT)) player.velocity.x += player.moveSpeed;
+    if(IsKeyDown(MOVE_LEFT))  player.velocity.x -= player.moveSpeed;
+    if(IsKeyPressed(JUMP) && player.isGrounded) {
         player.velocity.y = -player.jumpForce;
         player.isGrounded = false;
     }
@@ -72,10 +74,20 @@ void updateGame(float deltaTime) {
         player.isGrounded = true;
     }
     for(int i = 0; i < levelArray[currentLevel].objectCount; i++) {
-        
-        if(checkSqSqCollision(player.position, player.size, roomObjects[i].position, tileSize)) {
-            handlePlayerCollision(&player.position, &player.velocity, player.size, &player.isGrounded, roomObjects[i].position, tileSize);
+        switch (roomObjects[i].type) {
+        case OBJECT:
+            if(checkSqSqCollision(player.position, player.size, roomObjects[i].position, tileSize))
+                handlePlayerCollision(&player.position, &player.velocity, player.size, &player.isGrounded, roomObjects[i].position, tileSize);
+
+            break;
+        case SPAWN:
+            if(!player.isAlive) spawnPlayer(&player, roomObjects[i].position.x * tileSize, roomObjects[i].position.y * tileSize);
+
+            break;
+        default:
+            break;
         }
+
     }
 
     // Friction

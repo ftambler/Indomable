@@ -1,14 +1,23 @@
 #include <math.h>
 #include "player.h"
 
-void InitPlayer(Player* player) {
-    player->position = (Vector2){0, 0};
+void initPlayer(Player* player) {
     player->velocity = (Vector2){0, 0};
-    
     player->size = 32;
-    player->isGrounded = true;
+    player->isGrounded = false;
+    player->isAlive = false;
     player->moveSpeed = 250;
     player->jumpForce = 300;
+}
+
+void spawnPlayer(Player* player, int x, int y) {
+    player->position = (Vector2){x, y};
+    player->velocity = (Vector2){0, 0};
+    player->isAlive = true;
+}
+
+void killPlayer(Player* player) {
+    player->isAlive = false;
 }
 
 void handlePlayerCollision(Vector2 *playerPos, Vector2 *playerVel, int playerSize, bool *grounded, Vector2 obj, int objSize) {

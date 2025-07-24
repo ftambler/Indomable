@@ -5,7 +5,8 @@
             {"type": "OBJECT", "position": { "x": 5, "y": 31 }, "tileId" : 0},
             {"type": "OBJECT", "position": { "x": 3, "y": 28 }, "tileId" : 0},
             {"type": "OBJECT", "position": { "x": 1, "y": 25 }, "tileId" : 0},
-            {"type": "OBJECT", "position": { "x": 3, "y": 22 }, "tileId" : 0}
+            {"type": "OBJECT", "position": { "x": 3, "y": 22 }, "tileId" : 0},
+            {"type": "SPAWN", "position": { "x": 20, "y": 20 }}
           ]
         },
         {

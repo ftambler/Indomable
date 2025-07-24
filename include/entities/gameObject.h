@@ -1,7 +1,7 @@
 #pragma once
 
-#include "block.h"
 #include "raylib.h"
+#include "block.h"
 
 typedef enum { OBJECT, SPAWN, NEXT, WIN } Type;
 
