@@ -7,8 +7,8 @@ void InitPlayer(Player* player) {
     
     player->size = 32;
     player->isGrounded = true;
-    player->moveSpeed = 5;
-    player->jumpForce = 5;
+    player->moveSpeed = 250;
+    player->jumpForce = 300;
 }
 
 void handlePlayerCollision(Vector2 *playerPos, Vector2 *playerVel, int playerSize, bool *grounded, Vector2 obj, int objSize) {

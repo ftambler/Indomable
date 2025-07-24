@@ -23,10 +23,6 @@ static const int MOVE_RIGHT = KEY_RIGHT;
 static const int JUMP = KEY_UP;
 // static const int PAUSE = KEY_P;
 
-// Physics
-float gravity = 10;
-float groundFriction = -0.6f;
-
 // Texture
 Texture2D playerSprite;
 Texture2D grassSprite;
@@ -35,7 +31,6 @@ void initGame() {
     loadTextures();
     loadLevel(&level_count, &levelArray);
         
-
     InitPlayer(&player);
 
     roomObjects = levelArray[currentLevel].objects;
@@ -67,8 +62,8 @@ void updateGame(float deltaTime) {
     player.velocity.y += gravity * deltaTime;
 
     // Position
-    player.position.x += player.velocity.x + deltaTime;
-    player.position.y += player.velocity.y + deltaTime;
+    player.position.x += player.velocity.x * deltaTime;
+    player.position.y += player.velocity.y * deltaTime;
 
     // Collision (ground)
     if (player.position.y + player.size > screenHeight) {
