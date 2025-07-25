@@ -4,6 +4,7 @@
 #include "player.h"
 #include "loader.h"
 #include "physics.h"
+#include "renderer.h"
 
 
 //TODO
@@ -26,12 +27,13 @@ static const int RESET = KEY_R;
 // static const int PAUSE = KEY_P;
 
 // Texture
-Texture2D playerSprite;
+// Texture2D playerSprite;
 Texture2D grassSprite;
 
 void initGame() {
     loadTextures();
     loadLevel(&level_count, &levelArray, &activeCheckpoint);
+    initRenderer();
 
     initPlayer(&player);
 
@@ -40,14 +42,14 @@ void initGame() {
 
 
 void deInitGame() {
-    UnloadTexture(playerSprite);
+    // UnloadTexture(playerSprite);
     UnloadTexture(grassSprite);
     for(int i = 0; i < level_count; i++) free(levelArray[i].objects);
     free(levelArray);
 }
 
 void loadTextures() {    
-    playerSprite = LoadTexture("assets/textures/player.png");
+    // playerSprite = LoadTexture("assets/textures/player.png");
     grassSprite = LoadTexture("assets/textures/grass.png");
 }
 
@@ -144,10 +146,11 @@ void drawGame(void) {
 
     }
 
+    drawPlayer(player.position);
     // DrawTexture(playerSprite, player.position.x, player.position.y, WHITE);
-    DrawTexturePro(playerSprite, (Rectangle){ 0.0f, 0.0f, playerSprite.height, playerSprite.width }, 
-        (Rectangle){ player.position.x, player.position.y, player.size, player.size }, 
-        (Vector2){0, 0}, 0.0f, WHITE);
+    // DrawTexturePro(playerSprite, (Rectangle){ 0.0f, 0.0f, playerSprite.height, playerSprite.width }, 
+    //     (Rectangle){ player.position.x, player.position.y, player.size, player.size }, 
+    //     (Vector2){0, 0}, 0.0f, WHITE);
 
     EndDrawing();
 }
