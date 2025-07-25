@@ -1,9 +1,12 @@
 #include <stdio.h>
 #include <stdlib.h>
+
+#include "loader.h"
+
 #include "cJSON.h"
 #include "level.h"
 
-int loadLevel(int* level_count, Level** levelArray) {
+int loadLevel(int* level_count, Level** levelArray, GameObject** activeCheckpoint) {
     FILE *fp = fopen("assets/levels/level1.json", "r");
     if (fp == NULL) {
         printf("Error: Unable to open the file.\n");
@@ -58,14 +61,32 @@ int loadLevel(int* level_count, Level** levelArray) {
             cJSON* type = cJSON_GetObjectItem(obj, "type");
             cJSON* pos = cJSON_GetObjectItem(obj, "position");
 
-            levelsPtr[i].objects[j].type = getEnumOfType(type->valuestring);
             levelsPtr[i].objects[j].position.x = cJSON_GetObjectItem(pos, "x")->valueint;
             levelsPtr[i].objects[j].position.y = cJSON_GetObjectItem(pos, "y")->valueint;
+            
+            // GameObject Type
+            switch(getEnumOfType(type->valuestring)) {
+                case OBJECT:
+                    levelsPtr[i].objects[j].type = OBJECT;
+                    // TODO ASSIGN TEXTURE
+                    levelsPtr[i].objects[j].object.textureId = GRASS;
+                    break;
+                    
+                case SPAWN:
+                    levelsPtr[i].objects[j].type = CHECKPOINT;
+                    levelsPtr[i].objects[j].checkpoint.isActive = true;
+                    *activeCheckpoint = &levelsPtr[i].objects[j];
+                    break;
 
-            if (levelsPtr[i].objects[j].type != OBJECT) continue;
+                case CHECKPOINT:
+                    levelsPtr[i].objects[j].type = CHECKPOINT;
+                    levelsPtr[i].objects[j].checkpoint.isActive = false;
+                    break;    
+                
+                default:
+                    break;
+            }
 
-            // TODO TEXTURE ASIGNMENT
-            levelsPtr[i].objects[j].object.textureId = GRASS;
         }
     }
 

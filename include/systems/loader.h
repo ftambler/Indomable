@@ -1,3 +1,6 @@
 #pragma once
 
-int loadLevel(int* level_count, Level** levelArray);
+#include "level.h"
+#include "gameObject.h"
+
+int loadLevel(int* level_count, Level** levelArray, GameObject** activeCheckpoint);

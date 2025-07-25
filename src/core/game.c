@@ -13,6 +13,7 @@ int tileSize = 20;
 // Global
 Level* levelArray;
 GameObject* roomObjects;
+GameObject* activeCheckpoint;
 int currentLevel;
 int level_count;
 Player player;
@@ -30,8 +31,8 @@ Texture2D grassSprite;
 
 void initGame() {
     loadTextures();
-    loadLevel(&level_count, &levelArray);
-        
+    loadLevel(&level_count, &levelArray, &activeCheckpoint);
+
     initPlayer(&player);
 
     roomObjects = levelArray[currentLevel].objects;
@@ -51,6 +52,9 @@ void loadTextures() {
 }
 
 void updateGame(float deltaTime) {
+    
+    if (!player.isAlive) spawnPlayer(&player, activeCheckpoint->position.x * tileSize, activeCheckpoint->position.y * tileSize);
+
     // Input
     if(IsKeyDown(RESET)) player.isAlive = false;
     if(IsKeyDown(MOVE_RIGHT)) player.velocity.x += player.moveSpeed;
@@ -73,19 +77,25 @@ void updateGame(float deltaTime) {
         player.velocity.y = 0;
         player.isGrounded = true;
     }
+
     for(int i = 0; i < levelArray[currentLevel].objectCount; i++) {
         switch (roomObjects[i].type) {
-        case OBJECT:
-            if(checkSqSqCollision(player.position, player.size, roomObjects[i].position, tileSize))
+            case OBJECT:
+                if(checkSqSqCollision(player.position, player.size, roomObjects[i].position, tileSize))
                 handlePlayerCollision(&player.position, &player.velocity, player.size, &player.isGrounded, roomObjects[i].position, tileSize);
+                break;
+                
+            case CHECKPOINT:
+                // printf("%f %f %d \n", roomObjects[i].position.x, roomObjects[i].position.y, roomObjects[i].checkpoint.isActive);
+                if(checkSqSqCollision(player.position, player.size, roomObjects[i].position, tileSize) && !roomObjects[i].checkpoint.isActive) {
+                    setCheckpointInactive(&activeCheckpoint->checkpoint);
+                    activeCheckpoint = &roomObjects[i];
+                    setCheckpointActive(&activeCheckpoint->checkpoint);
+                } 
+                break;
 
-            break;
-        case SPAWN:
-            if(!player.isAlive) spawnPlayer(&player, roomObjects[i].position.x * tileSize, roomObjects[i].position.y * tileSize);
-
-            break;
-        default:
-            break;
+            default:
+                break;
         }
 
     }
@@ -106,6 +116,14 @@ void drawGame(void) {
 
     for(int i = 0; i < levelArray[currentLevel].objectCount; i++) {
         // DrawRectangle(roomObjects[i].position.x * tileSize, roomObjects[i].position.y * tileSize, tileSize, tileSize, BLACK);
+        
+        if(roomObjects[i].type == CHECKPOINT) {
+            if(roomObjects[i].checkpoint.isActive)  
+                DrawRectangle(roomObjects[i].position.x * tileSize, roomObjects[i].position.y * tileSize, tileSize, tileSize, GREEN);
+            else 
+                DrawRectangle(roomObjects[i].position.x * tileSize, roomObjects[i].position.y * tileSize, tileSize, tileSize, RED);
+        }
+
         if(roomObjects[i].type != OBJECT) continue;
 
         Texture2D drawTexture;

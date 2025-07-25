@@ -8,3 +8,5 @@ typedef struct {
     TextureId textureId;
     int size;
 } Block;
+
+int getEnumOfTexture(char* value);
