@@ -6,7 +6,6 @@
 #include "physics.h"
 #include "renderer.h"
 
-
 //TODO
 int screenHeight = 680;
 int tileSize = 20;
@@ -43,7 +42,6 @@ void deInitGame() {
 }
 
 void updateGame(float deltaTime) {
-    
     if (!player.isAlive) spawnPlayer(&player, activeCheckpoint->position.x * tileSize, activeCheckpoint->position.y * tileSize);
 
     // Input
@@ -106,7 +104,7 @@ void drawGame(void) {
 
     drawLevel(&levelArray[currentLevel]);
 
-    drawPlayer(player.position);
+    drawPlayer(player.position, player.size);
 
     EndDrawing();
 }
