@@ -68,6 +68,9 @@ int loadLevel(int* level_count, Level** levelArray, GameObject** activeCheckpoin
             switch(getEnumOfType(type->valuestring)) {
                 case OBJECT:
                     levelsPtr[i].objects[j].type = OBJECT;
+                    // TODO DEFAULT SIZE IF MISSING
+                    levelsPtr[i].objects[j].object.size = cJSON_GetObjectItem(obj, "size")->valueint;
+
                     // TODO ASSIGN TEXTURE
                     levelsPtr[i].objects[j].object.textureId = GRASS;
                     break;

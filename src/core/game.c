@@ -8,7 +8,7 @@
 
 //TODO
 int screenHeight = 680;
-int tileSize = 20;
+// int tileSize = 20;
 
 // Global
 Level* levelArray;
@@ -31,6 +31,7 @@ void initGame() {
 
     initPlayer(&player);
 
+    currentLevel = 0;
     roomObjects = levelArray[currentLevel].objects;
 }
 
@@ -102,7 +103,7 @@ void drawGame(void) {
     sprintf(level, "Level %d", currentLevel);
     DrawText(level, 0, 0, 20, BLACK);
 
-    drawLevel(&levelArray[currentLevel]);
+    drawLevel(&(levelArray[currentLevel]));
 
     drawPlayer(player.position, player.size);
 

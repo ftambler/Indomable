@@ -4,6 +4,9 @@
 Texture2D playerSprite;
 Texture2D grassSprite;
 
+// TODO, NOT THIS
+int tileSize = 20;
+
 void initRenderer() {
     playerSprite = LoadTexture("assets/textures/player.png");
     grassSprite = LoadTexture("assets/textures/grass.png");
@@ -21,31 +24,33 @@ void drawPlayer(Vector2 position, int playerSize) {
         (Vector2){0, 0}, 0.0f, WHITE);
 }
 
-void drawBlock(Texture2D drawTexture, Vector2 position, int tileSize) {
+void drawBlock(Texture2D drawTexture, Vector2 position, int size) {
     DrawTexturePro(drawTexture, 
         (Rectangle){ 0.0f, 0.0f, grassSprite.height, grassSprite.width }, 
-        (Rectangle){ position.x * tileSize, position.y * tileSize, tileSize, tileSize }, 
+        (Rectangle){ position.x * tileSize, position.y * tileSize, size, size }, 
         (Vector2){0, 0}, 0.0f, WHITE);
 }
 
 void drawLevel(Level* level) {
     GameObject* roomObjects = level->objects;
-    int tileSize = 20;
-
+    
     for(int i = 0; i < level->objectCount; i++) {
         switch(roomObjects[i].type) {
             case CHECKPOINT:
-                DrawRectangle(roomObjects[i].position.x * tileSize, roomObjects[i].position.y * tileSize, tileSize, tileSize, roomObjects[i].checkpoint.isActive ? GREEN : RED);
+                DrawRectangle(roomObjects[i].position.x * tileSize, 
+                    roomObjects[i].position.y * tileSize, tileSize, tileSize, 
+                    roomObjects[i].checkpoint.isActive ? GREEN : RED);
+
                 break;
             
             case OBJECT:
                 switch (roomObjects[i].object.textureId) {
                     case GRASS:
-                        drawBlock(grassSprite, roomObjects[i].position, 20);
+                        drawBlock(grassSprite, roomObjects[i].position, roomObjects[i].object.size);
                         break;
                         
                     default:
-                        drawBlock(grassSprite, roomObjects[i].position, 20);
+                        drawBlock(grassSprite, roomObjects[i].position, roomObjects[i].object.size);
                         break;
                 }
                 break;
