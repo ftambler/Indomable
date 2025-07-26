@@ -26,12 +26,7 @@ static const int JUMP = KEY_UP;
 static const int RESET = KEY_R;
 // static const int PAUSE = KEY_P;
 
-// Texture
-// Texture2D playerSprite;
-Texture2D grassSprite;
-
 void initGame() {
-    loadTextures();
     loadLevel(&level_count, &levelArray, &activeCheckpoint);
     initRenderer();
 
@@ -42,15 +37,9 @@ void initGame() {
 
 
 void deInitGame() {
-    // UnloadTexture(playerSprite);
-    UnloadTexture(grassSprite);
+    deInitRenderer();
     for(int i = 0; i < level_count; i++) free(levelArray[i].objects);
     free(levelArray);
-}
-
-void loadTextures() {    
-    // playerSprite = LoadTexture("assets/textures/player.png");
-    grassSprite = LoadTexture("assets/textures/grass.png");
 }
 
 void updateGame(float deltaTime) {
@@ -88,7 +77,6 @@ void updateGame(float deltaTime) {
                 break;
                 
             case CHECKPOINT:
-                // printf("%f %f %d \n", roomObjects[i].position.x, roomObjects[i].position.y, roomObjects[i].checkpoint.isActive);
                 if(checkSqSqCollision(player.position, player.size, roomObjects[i].position, tileSize) && !roomObjects[i].checkpoint.isActive) {
                     setCheckpointInactive(&activeCheckpoint->checkpoint);
                     activeCheckpoint = &roomObjects[i];
@@ -108,49 +96,17 @@ void updateGame(float deltaTime) {
 
 char level[8];
 void drawGame(void) {
-
     BeginDrawing();
     
     ClearBackground(RAYWHITE);
     
+    // Current Level
     sprintf(level, "Level %d", currentLevel);
     DrawText(level, 0, 0, 20, BLACK);
 
-    for(int i = 0; i < levelArray[currentLevel].objectCount; i++) {
-        // DrawRectangle(roomObjects[i].position.x * tileSize, roomObjects[i].position.y * tileSize, tileSize, tileSize, BLACK);
-        
-        if(roomObjects[i].type == CHECKPOINT) {
-            if(roomObjects[i].checkpoint.isActive)  
-                DrawRectangle(roomObjects[i].position.x * tileSize, roomObjects[i].position.y * tileSize, tileSize, tileSize, GREEN);
-            else 
-                DrawRectangle(roomObjects[i].position.x * tileSize, roomObjects[i].position.y * tileSize, tileSize, tileSize, RED);
-        }
-
-        if(roomObjects[i].type != OBJECT) continue;
-
-        Texture2D drawTexture;
-        switch (roomObjects[i].object.textureId)
-        {
-        case GRASS:
-            drawTexture = grassSprite;
-            break;
-        
-        default:
-            drawTexture = grassSprite;
-            break;
-        }
-        
-        DrawTexturePro(drawTexture, (Rectangle){ 0.0f, 0.0f, grassSprite.height, grassSprite.width }, 
-            (Rectangle){ roomObjects[i].position.x * tileSize, roomObjects[i].position.y * tileSize, tileSize, tileSize }, 
-            (Vector2){0, 0}, 0.0f, WHITE);
-
-    }
+    drawLevel(&levelArray[currentLevel]);
 
     drawPlayer(player.position);
-    // DrawTexture(playerSprite, player.position.x, player.position.y, WHITE);
-    // DrawTexturePro(playerSprite, (Rectangle){ 0.0f, 0.0f, playerSprite.height, playerSprite.width }, 
-    //     (Rectangle){ player.position.x, player.position.y, player.size, player.size }, 
-    //     (Vector2){0, 0}, 0.0f, WHITE);
 
     EndDrawing();
 }

@@ -4,7 +4,8 @@
 #include "level.h"
 
 void initRenderer();
+void deInitRenderer();
 
 void drawPlayer(Vector2 position);
 
-void drawLevel(Level level);
+void drawLevel(Level* level);
