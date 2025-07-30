@@ -13,7 +13,7 @@
 extern float gravity;
 extern float groundFriction;
 
-void loadTextures();
+void updateGameScreen();
 
 void initGame();
 void deInitGame(void);

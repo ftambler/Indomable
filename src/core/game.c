@@ -42,6 +42,11 @@ void deInitGame() {
     free(levelArray);
 }
 
+void updateGameScreen() {
+    updateGame(GetFrameTime());
+    drawGame();
+}
+
 void updateGame(float deltaTime) {
     if (!player.isAlive) spawnPlayer(&player, activeCheckpoint->position.x * tileSize, activeCheckpoint->position.y * tileSize);
 
