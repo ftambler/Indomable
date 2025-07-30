@@ -2,12 +2,18 @@
   "Level" : [
     {
         "0" : [
-            {"type": "OBJECT", "position": { "x": 5, "y": 31 }, "tileId" : 0, "size": 20},
-            {"type": "OBJECT", "position": { "x": 3, "y": 28 }, "tileId" : 0, "size": 20},
-            {"type": "OBJECT", "position": { "x": 1, "y": 25 }, "tileId" : 0, "size": 20},
-            {"type": "OBJECT", "position": { "x": 3, "y": 22 }, "tileId" : 0, "size": 20},
-            {"type": "SPAWN", "position": { "x": 20, "y": 31 }},
-            {"type": "CHECKPOINT", "position": { "x": 26, "y": 31 }}
+            {"type": "OBJECT", "position": { "x": 0, "y": 16 }, "tileId" : 0, "size": 40},
+            {"type": "OBJECT", "position": { "x": 1, "y": 16 }, "tileId" : 0, "size": 40},
+            {"type": "OBJECT", "position": { "x": 2, "y": 16 }, "tileId" : 0, "size": 40},
+            {"type": "OBJECT", "position": { "x": 3, "y": 16 }, "tileId" : 0, "size": 40},
+            {"type": "OBJECT", "position": { "x": 4, "y": 16 }, "tileId" : 0, "size": 40},
+            {"type": "OBJECT", "position": { "x": 5, "y": 16 }, "tileId" : 0, "size": 40},
+            {"type": "OBJECT", "position": { "x": 6, "y": 16 }, "tileId" : 0, "size": 40},
+            {"type": "OBJECT", "position": { "x": 7, "y": 16 }, "tileId" : 0, "size": 40},
+            {"type": "OBJECT", "position": { "x": 8, "y": 16 }, "tileId" : 0, "size": 40},
+            {"type": "OBJECT", "position": { "x": 9, "y": 16 }, "tileId" : 0, "size": 40},
+            {"type": "SPAWN", "position": { "x": 9, "y": 13 }},
+            {"type": "CHECKPOINT", "position": { "x": 26, "y": 13 }}
 
           ]
         },
