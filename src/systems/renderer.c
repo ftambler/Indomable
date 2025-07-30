@@ -5,7 +5,7 @@ Texture2D playerSprite;
 Texture2D grassSprite;
 
 // TODO, NOT THIS
-int tileSize = 20;
+int tileSize = 40;
 
 void initRenderer() {
     playerSprite = LoadTexture("assets/textures/player.png");
@@ -26,7 +26,7 @@ void drawPlayer(Vector2 position, int playerSize) {
 
 void drawBlock(Texture2D drawTexture, Vector2 position, int size) {
     DrawTexturePro(drawTexture, 
-        (Rectangle){ 0.0f, 0.0f, grassSprite.height, grassSprite.width }, 
+        (Rectangle){ 0.0f, 0.0f, drawTexture.height, drawTexture.width }, 
         (Rectangle){ position.x * tileSize, position.y * tileSize, size, size }, 
         (Vector2){0, 0}, 0.0f, WHITE);
 }
