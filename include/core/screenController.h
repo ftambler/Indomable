@@ -6,4 +6,5 @@ typedef enum {
     CONFIG_SCREEN
 } Screen;
 
+// TODO REMOVE?
 extern Screen currentScreen;

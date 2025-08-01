@@ -5,6 +5,7 @@
 #include "loader.h"
 #include "physics.h"
 #include "renderer.h"
+#include "camera.h"
 
 //TODO
 int screenHeight = 680;
@@ -25,6 +26,13 @@ static const int JUMP = KEY_UP;
 static const int RESET = KEY_R;
 // static const int PAUSE = KEY_P;
 
+Camera2D camera = {
+    .target = (Vector2){ 0, 0},
+    .offset = (Vector2){ 200, 200},
+    .rotation = 0.0f,
+    .zoom = 1.0f
+};
+
 void initGame() {
     loadLevel(&level_count, &levelArray, &activeCheckpoint);
     initRenderer();
@@ -34,7 +42,6 @@ void initGame() {
     currentLevel = 0;
     roomObjects = levelArray[currentLevel].objects;
 }
-
 
 void deInitGame() {
     deInitRenderer();
@@ -50,8 +57,8 @@ void updateGameScreen() {
 void updateGame(float deltaTime) {
     if (!player.isAlive) spawnPlayer(&player, activeCheckpoint->position.x * tileSize, activeCheckpoint->position.y * tileSize);
 
-    // Input
-    if(IsKeyDown(RESET)) player.isAlive = false;
+    // Input (TODO VOID DEATH)
+    if(IsKeyDown(RESET) || player.position.y > screenHeight * 1.5f) player.isAlive = false;
     if(IsKeyDown(MOVE_RIGHT)) player.velocity.x += player.moveSpeed;
     if(IsKeyDown(MOVE_LEFT))  player.velocity.x -= player.moveSpeed;
     if(IsKeyPressed(JUMP) && player.isGrounded) {
@@ -61,18 +68,20 @@ void updateGame(float deltaTime) {
 
     // Gravity
     player.velocity.y += gravity * deltaTime;
-
     // Position
     player.position.x += player.velocity.x * deltaTime;
     player.position.y += player.velocity.y * deltaTime;
 
     // Collision (ground)
-    if (player.position.y + player.size > screenHeight) {
-        player.position.y = screenHeight - player.size;
-        player.velocity.y = 0;
-        player.isGrounded = true;
-    }
+    // if (player.position.y + player.size > screenHeight) {
+    //     player.position.y = screenHeight - player.size;
+    //     player.velocity.y = 0;
+    //     player.isGrounded = true;
+    // }
 
+    updateCamera(&camera, player.position);
+
+    // GameObject Collisions
     for(int i = 0; i < levelArray[currentLevel].objectCount; i++) {
         switch (roomObjects[i].type) {
             case OBJECT:
@@ -108,9 +117,13 @@ void drawGame(void) {
     sprintf(level, "Level %d", currentLevel);
     DrawText(level, 0, 0, 20, BLACK);
 
-    drawLevel(&(levelArray[currentLevel]));
+    BeginMode2D(camera);
 
-    drawPlayer(player.position, player.size);
+        drawLevel(&(levelArray[currentLevel]));
+
+        drawPlayer(player.position, player.size);
+
+    EndMode2D();
 
     EndDrawing();
 }
