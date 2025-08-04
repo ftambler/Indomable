@@ -1,35 +1,49 @@
 #include <stdio.h>
 #include <stdlib.h>
+
 #include "game.h"
 #include "player.h"
 #include "loader.h"
 #include "physics.h"
 #include "renderer.h"
 #include "camera.h"
+#include "button.h"
 
-// Global
+// Level
 Level* levelArray;
 GameObject* roomObjects;
 GameObject* activeCheckpoint;
 int currentLevel;
 int level_count;
 Player player;
+Camera2D camera;
 
 // Controls
 static const int MOVE_LEFT = KEY_LEFT;
 static const int MOVE_RIGHT = KEY_RIGHT;
 static const int JUMP = KEY_UP;
 static const int RESET = KEY_R;
-// static const int PAUSE = KEY_P;
+static const int PAUSE = KEY_P;
 
-Camera2D camera = {0};
+// Misc
+bool paused;
+
+Button titleScreenButton = {
+    .bounds = { 100, 100, 200, 50 },
+    .text = "Exit to title Screen",
+    .bgColor = GRAY,
+    .hoverColor = DARKGRAY,
+    .textColor = WHITE,
+};
+
+bool exitGameClicked = false;
 
 void initGame() {
-    initCamera(&camera, player.position);
-
+    paused =
     loadLevel(&level_count, &levelArray, &activeCheckpoint);
     initRenderer();
-
+    
+    initCamera(&camera, player.position);
     initPlayer(&player);
 
     currentLevel = 0;
@@ -43,11 +57,19 @@ void deInitGame() {
 }
 
 void updateGameScreen() {
-    updateGame(GetFrameTime());
-    drawGame();
+    if(paused) updatePauseMenu();
+    else updateGame(GetFrameTime());
+    
+    BeginDrawing();
+        drawGame();
+        if(paused) drawPausedMenuOverLay();
+    EndDrawing();
+
 }
 
-void updateGame(float deltaTime) {
+void updateGame(float deltaTime) {    
+    if(paused) return;
+
     if (!player.isAlive) spawnPlayer(&player, activeCheckpoint->position.x * tileSize, activeCheckpoint->position.y * tileSize);
 
     // Input (TODO VOID DEATH)
@@ -58,6 +80,7 @@ void updateGame(float deltaTime) {
         player.velocity.y = -player.jumpForce;
         player.isGrounded = false;
     }
+    if(IsKeyDown(PAUSE)) paused = true;
 
     // Gravity
     player.velocity.y += gravity * deltaTime;
@@ -93,10 +116,10 @@ void updateGame(float deltaTime) {
 
 }
 
-char level[8];
 void drawGame(void) {
-    BeginDrawing();
+    char level[8];
     
+    // TODO BACKGROUND
     ClearBackground(RAYWHITE);
     
     // Current Level
@@ -110,6 +133,23 @@ void drawGame(void) {
         drawPlayer(player.position, player.size);
 
     EndMode2D();
+}
 
-    EndDrawing();
+void drawPausedMenuOverLay() {
+    DrawRectangle(0,0,GetScreenWidth(), GetScreenHeight(), (Color){40,40,40,128});
+
+    drawButton(&titleScreenButton);
+}
+
+void updatePauseMenu() {
+    updateButton(&titleScreenButton);
+    if(isButtonClicked(&titleScreenButton)) {
+        exitGameClicked = true;
+    }
+}
+
+bool shouldStopGame() {
+    bool res = exitGameClicked;
+    exitGameClicked = false;
+    return res;
 }

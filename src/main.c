@@ -31,6 +31,10 @@ int main(void) {
         
         case GAME_SCREEN:
             updateGameScreen();
+            if(shouldStopGame()) {
+                deInitGame();
+                currentScreen = TITLE_SCREEN;
+            }
             break;
 
         default:
