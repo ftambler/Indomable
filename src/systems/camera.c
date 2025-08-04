@@ -1,7 +1,13 @@
 #include "camera.h"
 
-#define DEADZONE_HEIGHT 200
-#define DEADZONE_WIDTH 200
+#define DEADZONE_HEIGHT 150
+#define DEADZONE_WIDTH 100
+
+void initCamera(Camera2D* camera, const Vector2 playerPos) {
+    camera->offset = (Vector2){ GetScreenWidth()/2, GetScreenHeight()/2 };
+    camera->target = playerPos;
+    camera->zoom = 1.0f;
+}
 
 void updateCamera(Camera2D* camera, const Vector2 playerPos) {
     Rectangle deadZone = {

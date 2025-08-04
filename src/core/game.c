@@ -7,10 +7,6 @@
 #include "renderer.h"
 #include "camera.h"
 
-//TODO
-int screenHeight = 680;
-// int tileSize = 20;
-
 // Global
 Level* levelArray;
 GameObject* roomObjects;
@@ -26,14 +22,11 @@ static const int JUMP = KEY_UP;
 static const int RESET = KEY_R;
 // static const int PAUSE = KEY_P;
 
-Camera2D camera = {
-    .target = (Vector2){ 0, 0},
-    .offset = (Vector2){ 200, 200},
-    .rotation = 0.0f,
-    .zoom = 1.0f
-};
+Camera2D camera = {0};
 
 void initGame() {
+    initCamera(&camera, player.position);
+
     loadLevel(&level_count, &levelArray, &activeCheckpoint);
     initRenderer();
 
@@ -58,7 +51,7 @@ void updateGame(float deltaTime) {
     if (!player.isAlive) spawnPlayer(&player, activeCheckpoint->position.x * tileSize, activeCheckpoint->position.y * tileSize);
 
     // Input (TODO VOID DEATH)
-    if(IsKeyDown(RESET) || player.position.y > screenHeight * 1.5f) player.isAlive = false;
+    if(IsKeyDown(RESET) || player.position.y > GetScreenHeight() * 1.5f) player.isAlive = false;
     if(IsKeyDown(MOVE_RIGHT)) player.velocity.x += player.moveSpeed;
     if(IsKeyDown(MOVE_LEFT))  player.velocity.x -= player.moveSpeed;
     if(IsKeyPressed(JUMP) && player.isGrounded) {
@@ -68,16 +61,11 @@ void updateGame(float deltaTime) {
 
     // Gravity
     player.velocity.y += gravity * deltaTime;
+    // Friction
+    player.velocity.x *= groundFriction;
     // Position
     player.position.x += player.velocity.x * deltaTime;
     player.position.y += player.velocity.y * deltaTime;
-
-    // Collision (ground)
-    // if (player.position.y + player.size > screenHeight) {
-    //     player.position.y = screenHeight - player.size;
-    //     player.velocity.y = 0;
-    //     player.isGrounded = true;
-    // }
 
     updateCamera(&camera, player.position);
 
@@ -103,8 +91,6 @@ void updateGame(float deltaTime) {
 
     }
 
-    // Friction
-    player.velocity.x *= groundFriction;
 }
 
 char level[8];
@@ -115,7 +101,7 @@ void drawGame(void) {
     
     // Current Level
     sprintf(level, "Level %d", currentLevel);
-    DrawText(level, 0, 0, 20, BLACK);
+    DrawText(level, 20, 20, 20, BLACK);
 
     BeginMode2D(camera);
 

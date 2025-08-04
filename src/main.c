@@ -7,8 +7,11 @@
 #include "titleScreen.h"
 
 // Screen Config
-static const int screenWidth = 1200;
-static const int screenHeight = 680;
+// static const int screenWidth = 1200;
+// static const int screenHeight = 680;
+
+#define screenWidth 1200
+#define screenHeight 680
 
 Screen currentScreen = TITLE_SCREEN;
 
@@ -38,7 +41,7 @@ int main(void) {
 
     if(currentScreen == GAME_SCREEN)
         deInitGame();
-        
+
     CloseWindow();
     return 0;
 }
