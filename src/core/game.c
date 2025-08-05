@@ -28,26 +28,30 @@ static const int PAUSE = KEY_P;
 // Misc
 bool paused;
 
-Button titleScreenButton = {
-    .bounds = { 100, 100, 200, 50 },
-    .text = "Exit to title Screen",
-    .bgColor = GRAY,
-    .hoverColor = DARKGRAY,
-    .textColor = WHITE,
-};
+Button titleScreenButton;
+Button unpauseButton;
 
 bool exitGameClicked = false;
 
 void initGame() {
-    paused =
+    paused = false;
     loadLevel(&level_count, &levelArray, &activeCheckpoint);
-    initRenderer();
     
     initCamera(&camera, player.position);
     initPlayer(&player);
+    initPauseMenuButtons();
+
+    initRenderer();
 
     currentLevel = 0;
     roomObjects = levelArray[currentLevel].objects;
+}
+
+void initPauseMenuButtons() {
+    Rectangle pos = {(GetScreenWidth() / 2) - 100, (GetScreenHeight() / 2) - 40, 200, 80};
+    initButton(&unpauseButton, pos, "Resume", GRAY, DARKGRAY, WHITE);
+    pos.y += 120;
+    initButton(&titleScreenButton, pos, "Exit to Menu", GRAY, DARKGRAY, WHITE);
 }
 
 void deInitGame() {
@@ -72,7 +76,7 @@ void updateGame(float deltaTime) {
 
     if (!player.isAlive) spawnPlayer(&player, activeCheckpoint->position.x * tileSize, activeCheckpoint->position.y * tileSize);
 
-    // Input (TODO VOID DEATH)
+    // Input
     if(IsKeyDown(RESET) || player.position.y > GetScreenHeight() * 1.5f) player.isAlive = false;
     if(IsKeyDown(MOVE_RIGHT)) player.velocity.x += player.moveSpeed;
     if(IsKeyDown(MOVE_LEFT))  player.velocity.x -= player.moveSpeed;
@@ -136,16 +140,18 @@ void drawGame(void) {
 }
 
 void drawPausedMenuOverLay() {
-    DrawRectangle(0,0,GetScreenWidth(), GetScreenHeight(), (Color){40,40,40,128});
+    DrawRectangle(0, 0, GetScreenWidth(), GetScreenHeight(), (Color){50, 50, 50, 128});
 
+    drawButton(&unpauseButton);
     drawButton(&titleScreenButton);
 }
 
 void updatePauseMenu() {
     updateButton(&titleScreenButton);
-    if(isButtonClicked(&titleScreenButton)) {
-        exitGameClicked = true;
-    }
+    updateButton(&unpauseButton);
+
+    if(isButtonClicked(&titleScreenButton)) exitGameClicked = true;
+    if(isButtonClicked(&unpauseButton)) paused = false;
 }
 
 bool shouldStopGame() {

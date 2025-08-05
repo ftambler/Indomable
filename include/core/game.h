@@ -10,8 +10,10 @@ extern float groundFriction;
 void updateGameScreen();
 
 void initGame();
-bool shouldStopGame();
+void initPauseMenuButtons();
 void deInitGame(void);
+
+bool shouldStopGame();
 
 void updateGame(float deltaTime);
 void updatePauseMenu();
