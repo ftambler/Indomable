@@ -46,3 +46,13 @@ void handlePlayerCollision(Vector2 *playerPos, Vector2 *playerVel, int playerSiz
         }
     }
 }
+
+void handlePlayerInput(Player* player) {
+    if(IsKeyDown(RESET) || player->position.y > GetScreenHeight() * 1.5f) player->isAlive = false;
+    if(IsKeyDown(MOVE_RIGHT)) player->velocity.x += player->moveSpeed;
+    if(IsKeyDown(MOVE_LEFT))  player->velocity.x -= player->moveSpeed;
+    if(IsKeyPressed(JUMP) && player->isGrounded) {
+        player->velocity.y = -player->jumpForce;
+        player->isGrounded = false;
+    }
+}

@@ -8,6 +8,7 @@
 #include "renderer.h"
 #include "camera.h"
 #include "button.h"
+#include "inputs.h"
 
 // Level
 Level* levelArray;
@@ -17,13 +18,6 @@ int currentLevel;
 int level_count;
 Player player;
 Camera2D camera;
-
-// Controls
-static const int MOVE_LEFT = KEY_LEFT;
-static const int MOVE_RIGHT = KEY_RIGHT;
-static const int JUMP = KEY_UP;
-static const int RESET = KEY_R;
-static const int PAUSE = KEY_P;
 
 // Misc
 bool paused;
@@ -77,13 +71,8 @@ void updateGame(float deltaTime) {
     if (!player.isAlive) spawnPlayer(&player, activeCheckpoint->position.x * tileSize, activeCheckpoint->position.y * tileSize);
 
     // Input
-    if(IsKeyDown(RESET) || player.position.y > GetScreenHeight() * 1.5f) player.isAlive = false;
-    if(IsKeyDown(MOVE_RIGHT)) player.velocity.x += player.moveSpeed;
-    if(IsKeyDown(MOVE_LEFT))  player.velocity.x -= player.moveSpeed;
-    if(IsKeyPressed(JUMP) && player.isGrounded) {
-        player.velocity.y = -player.jumpForce;
-        player.isGrounded = false;
-    }
+    handlePlayerInput(&player);
+
     if(IsKeyDown(PAUSE)) paused = true;
 
     // Gravity
