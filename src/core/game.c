@@ -1,14 +1,17 @@
+#include "game.h"
+
 #include <stdio.h>
 #include <stdlib.h>
 
-#include "game.h"
-#include "player.h"
+#include "pauseOverlay.h"
+#include "renderer.h"
+#include "level.h"
 #include "levelLoader.h"
 #include "physics.h"
-#include "renderer.h"
 #include "camera.h"
-#include "button.h"
-#include "inputs.h"
+#include "player.h"
+#include "gameObject.h"
+
 
 // Level
 Level* levelArray;
@@ -22,9 +25,6 @@ Camera2D camera;
 // Misc
 bool paused;
 
-Button titleScreenButton;
-Button unpauseButton;
-
 bool exitGameClicked = false;
 
 void initGame() {
@@ -33,19 +33,12 @@ void initGame() {
     
     initCamera(&camera, player.position);
     initPlayer(&player);
-    initPauseMenuButtons();
+    initPauseOverlay();
 
     initRenderer();
 
     currentLevel = 0;
     roomObjects = levelArray[currentLevel].objects;
-}
-
-void initPauseMenuButtons() {
-    Rectangle pos = {(GetScreenWidth() / 2) - 100, (GetScreenHeight() / 2) - 40, 200, 80};
-    initButton(&unpauseButton, pos, "Resume", GRAY, DARKGRAY, WHITE);
-    pos.y += 120;
-    initButton(&titleScreenButton, pos, "Exit to Menu", GRAY, DARKGRAY, WHITE);
 }
 
 void deInitGame() {
@@ -55,12 +48,12 @@ void deInitGame() {
 }
 
 void updateGameScreen() {
-    if(paused) updatePauseMenu();
+    if(paused) updatePauseOverlay(&paused, &exitGameClicked);
     else updateGame(GetFrameTime());
     
     BeginDrawing();
         drawGame();
-        if(paused) drawPausedMenuOverLay();
+        if(paused) drawPauseOverlay();
     EndDrawing();
 
 }
@@ -120,23 +113,6 @@ void drawGame(void) {
         drawPlayer(player.position, player.size);
 
     EndMode2D();
-}
-
-void drawPausedMenuOverLay() {
-    DrawRectangle(0, 0, GetScreenWidth(), GetScreenHeight(), (Color){50, 50, 50, 128});
-
-
-    DrawText("Paused", GetScreenWidth()/2 - MeasureText("Paused", 40)/2, GetScreenHeight()/2 - 120, 40, BLACK);
-    drawButton(&unpauseButton);
-    drawButton(&titleScreenButton);
-}
-
-void updatePauseMenu() {
-    updateButton(&titleScreenButton);
-    updateButton(&unpauseButton);
-
-    if(isButtonClicked(&titleScreenButton)) exitGameClicked = true;
-    if(isButtonClicked(&unpauseButton)) paused = false;
 }
 
 bool shouldStopGame() {
