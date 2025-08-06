@@ -2,13 +2,9 @@
 
 #include "raylib.h"
 
-#include "screenController.h"
+#include "screen.h"
 #include "game.h"
 #include "titleScreen.h"
-
-// Screen Config
-// static const int screenWidth = 1200;
-// static const int screenHeight = 680;
 
 #define screenWidth 1200
 #define screenHeight 680

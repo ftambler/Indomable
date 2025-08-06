@@ -5,6 +5,3 @@ typedef enum {
     GAME_SCREEN,
     CONFIG_SCREEN
 } Screen;
-
-// TODO REMOVE?
-extern Screen currentScreen;

@@ -1,11 +1,11 @@
 # Compiler and flags
 CC = gcc
-CFLAGS = -Iinclude/core -Iinclude/entities -Iinclude/systems -Iinclude/utils -Ilib/raylib/include -Ilib/cJSON -Isrc/utils -Wall -Wextra -g
+CFLAGS = -Iinclude/assets -Iinclude/core -Iinclude/entities -Iinclude/graphics -Iinclude/physics -Iinclude/screens -Iinclude/utils -Ilib/raylib/include -Ilib/cJSON -Isrc/utils -Wall -Wextra -g
 LDFLAGS = -Llib/raylib/lib -lraylib -lopengl32 -lgdi32 -lwinmm
 
 # Source files
 # SRC = src/main.c lib/cJSON/cJSON.c src/utils/prints.c
-SRC := $(wildcard src/*.c src/core/*.c src/entities/*.c src/systems/*.c src/utils/*.c lib/cJSON/*.c)
+SRC := $(wildcard src/*.c src/assets/*.c src/core/*.c src/entities/*.c src/graphics/*.c src/physics/*.c src/screens/*.c src/utils/*.c lib/cJSON/*.c)
 OBJ = $(SRC:.c=.o)
 
 # Output executable
@@ -24,6 +24,6 @@ $(TARGET): $(OBJ)
 
 # Clean build files
 clean:
-	del /Q $(OBJ) $(TARGET)
+	rm -f $(OBJ) $(TARGET)
 
 .PHONY: all clean

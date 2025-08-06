@@ -1,7 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-#include "loader.h"
+#include "levelLoader.h"
 
 #include "cJSON.h"
 #include "level.h"
