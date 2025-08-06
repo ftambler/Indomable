@@ -66,22 +66,16 @@ void updateGameScreen() {
 }
 
 void updateGame(float deltaTime) {    
+    // Pause 
     if(paused) return;
-
-    if (!player.isAlive) spawnPlayer(&player, activeCheckpoint->position.x * tileSize, activeCheckpoint->position.y * tileSize);
-
-    // Input
-    handlePlayerInput(&player);
-
     if(IsKeyDown(PAUSE)) paused = true;
 
-    // Gravity
-    player.velocity.y += gravity * deltaTime;
-    // Friction
-    player.velocity.x *= groundFriction;
-    // Position
-    player.position.x += player.velocity.x * deltaTime;
-    player.position.y += player.velocity.y * deltaTime;
+    // Respawn (TODO ANIMATION)
+    if(!player.isAlive) 
+        spawnPlayer(&player, activeCheckpoint->position.x * tileSize, activeCheckpoint->position.y * tileSize);
+    
+    handlePlayerInput(&player);
+    handlePlayerPhysics(&player, deltaTime);
 
     updateCamera(&camera, player.position);
 
@@ -131,6 +125,8 @@ void drawGame(void) {
 void drawPausedMenuOverLay() {
     DrawRectangle(0, 0, GetScreenWidth(), GetScreenHeight(), (Color){50, 50, 50, 128});
 
+
+    DrawText("Paused", GetScreenWidth()/2 - MeasureText("Paused", 40)/2, GetScreenHeight()/2 - 120, 40, BLACK);
     drawButton(&unpauseButton);
     drawButton(&titleScreenButton);
 }

@@ -1,5 +1,6 @@
 #include <math.h>
 #include "player.h"
+#include "physics.h"
 
 void initPlayer(Player* player) {
     player->velocity = (Vector2){0, 0};
@@ -55,4 +56,14 @@ void handlePlayerInput(Player* player) {
         player->velocity.y = -player->jumpForce;
         player->isGrounded = false;
     }
+}
+
+void handlePlayerPhysics(Player* player, float deltaTime) {
+    // Gravity
+    player->velocity.y += gravity * deltaTime;
+    // Friction
+    player->velocity.x *= groundFriction;
+    // Position
+    player->position.x += player->velocity.x * deltaTime;
+    player->position.y += player->velocity.y * deltaTime;
 }

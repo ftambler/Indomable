@@ -23,3 +23,5 @@ void killPlayer(Player* player);
 void handlePlayerCollision(Vector2 *playerPos, Vector2 *playerVel, int playerSize, bool *grounded, Vector2 obj, int objSize);
 
 void handlePlayerInput(Player* player);
+
+void handlePlayerPhysics(Player* player, float deltaTime);
