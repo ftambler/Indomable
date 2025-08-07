@@ -1,11 +1,9 @@
 #include <stdio.h>
 #include "renderer.h"
+#include "config.h"
 
 Texture2D playerSprite;
 Texture2D grassSprite;
-
-// TODO, NOT THIS
-int tileSize = 40;
 
 void initRenderer() {
     playerSprite = LoadTexture("assets/textures/player.png");

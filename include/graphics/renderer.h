@@ -3,8 +3,6 @@
 #include "raylib.h"
 #include "level.h"
 
-extern int tileSize;
-
 void initRenderer();
 void deInitRenderer();
 
