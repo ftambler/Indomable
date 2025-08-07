@@ -2,6 +2,10 @@
 
 #include <stdbool.h>
 
+
+void initTitleScreen();
+
+//TODO RENAME TS
 void updateTitleScreen();
 
 void updateTitle();

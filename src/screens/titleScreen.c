@@ -1,17 +1,15 @@
-#include "raylib.h"
-
 #include "titleScreen.h"
+
+#include "raylib.h"
 #include "button.h"
 
 bool startGameClicked = false;
 
-Button startButton = {
-    .bounds = { 100, 100, 200, 50 },
-    .text = "Start",
-    .bgColor = GRAY,
-    .hoverColor = DARKGRAY,
-    .textColor = WHITE,
-};
+Button startButton;
+
+void initTitleScreen() {
+    initButton(&startButton, (Rectangle){GetScreenWidth()/2 - 200/2, GetScreenHeight()/2 - 50/2, 200, 50}, "Start", GRAY, DARKGRAY, WHITE);
+}
 
 void updateTitleScreen() {
     updateTitle();
@@ -29,7 +27,8 @@ void drawTitle() {
     BeginDrawing();
     
     ClearBackground(RAYWHITE);
-    
+
+    DrawText("JUEGUITO", GetScreenWidth()/2 - MeasureText("JUEGUITO", 40)/2, GetScreenHeight()/2 - 120, 40, BLACK);
     drawButton(&startButton);
 
     EndDrawing();

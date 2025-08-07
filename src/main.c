@@ -9,11 +9,13 @@
 #define screenWidth 1200
 #define screenHeight 680
 
-Screen currentScreen = TITLE_SCREEN;
 
 int main(void) {
     InitWindow(screenWidth, screenHeight, "Juego Epicardo");
     SetTargetFPS(60);
+
+    Screen currentScreen = TITLE_SCREEN;
+    initTitleScreen();
 
     while (!WindowShouldClose()) {
         switch (currentScreen) {
