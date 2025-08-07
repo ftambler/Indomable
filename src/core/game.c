@@ -11,7 +11,7 @@
 #include "camera.h"
 #include "player.h"
 #include "gameObject.h"
-
+#include "config.h"
 
 // Level
 Level* levelArray;
@@ -76,8 +76,9 @@ void updateGame(float deltaTime) {
     for(int i = 0; i < levelArray[currentLevel].objectCount; i++) {
         switch (roomObjects[i].type) {
             case OBJECT:
-                if(checkSqSqCollision(player.position, player.size, roomObjects[i].position, tileSize))
-                handlePlayerCollision(&player.position, &player.velocity, player.size, &player.isGrounded, roomObjects[i].position, tileSize);
+            // if(checkSqSqCollision(player.position, player.size, roomObjects[i].position, tileSize))
+                if(CheckCollisionRecs(getPlayerHitBox(&player), getObjectHitBox(&roomObjects[i])))
+                    handlePlayerCollision(&player.position, &player.velocity, player.size, &player.isGrounded, roomObjects[i].position, tileSize);
                 break;
                 
             case CHECKPOINT:

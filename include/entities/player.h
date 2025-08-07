@@ -25,3 +25,5 @@ void handlePlayerCollision(Vector2 *playerPos, Vector2 *playerVel, int playerSiz
 void handlePlayerInput(Player* player);
 
 void handlePlayerPhysics(Player* player, float deltaTime);
+
+Rectangle getPlayerHitBox(const Player* player);

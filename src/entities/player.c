@@ -2,6 +2,8 @@
 #include "player.h"
 #include "physics.h"
 
+// #include <stdio.h>
+
 void initPlayer(Player* player) {
     player->velocity = (Vector2){0, 0};
     player->size = 32;
@@ -66,4 +68,9 @@ void handlePlayerPhysics(Player* player, float deltaTime) {
     // Position
     player->position.x += player->velocity.x * deltaTime;
     player->position.y += player->velocity.y * deltaTime;
+}
+
+Rectangle getPlayerHitBox(const Player* player) {
+    // printf("Player %f %f %d %d \n", player->position.x, player->position.y, player->size, player->size);
+    return (Rectangle){player->position.x, player->position.y, player->size, player->size};
 }

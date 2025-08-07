@@ -16,3 +16,5 @@ typedef struct {
 } GameObject;
 
 int getEnumOfType(char* value);
+
+Rectangle getObjectHitBox(const GameObject* gameObject);
