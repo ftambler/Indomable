@@ -1,8 +1,10 @@
-#include <math.h>
 #include "player.h"
-#include "physics.h"
 
-// #include <stdio.h>
+#include <math.h>
+
+#include "physics.h"
+#include "inputs.h"
+#include "config.h"
 
 void initPlayer(Player* player) {
     player->velocity = (Vector2){0, 0};
@@ -24,12 +26,13 @@ void killPlayer(Player* player) {
     // TODO Animation
 }
 
-void handlePlayerCollision(Vector2 *playerPos, Vector2 *playerVel, int playerSize, bool *grounded, Vector2 obj, int objSize) {
+void handlePlayerCollision(Player* player, Rectangle objBounds) {
     // Compute overlaps
-    float overlapX = (playerPos->x + playerSize) - (obj.x * objSize);
-    float overlapX2 = ((obj.x * objSize) + objSize) - playerPos->x;
-    float overlapY = (playerPos->y + playerSize) - (obj.y * objSize);
-    float overlapY2 = ((obj.y * objSize) + objSize) - playerPos->y;
+    float overlapX = (player->position.x + player->size) - objBounds.x;
+    float overlapX2 = (objBounds.x + objBounds.width) - player->position.x;
+    float overlapY = (player->position.y + player->size) - objBounds.y;
+    float overlapY2 = (objBounds.y + objBounds.height) - player->position.y;
+
 
     // Determine minimal overlap on each axis
     float minX = (overlapX < overlapX2) ? overlapX : -overlapX2;
@@ -38,14 +41,14 @@ void handlePlayerCollision(Vector2 *playerPos, Vector2 *playerVel, int playerSiz
     // Choose the axis with shallower push-out
     if (fabsf(minX) < fabsf(minY)) {
         // Horizontal collision
-        playerPos->x -= minX;
-        playerVel->x = 0;
+        player->position.x -= minX;
+        player->velocity.x = 0;
     } else {
         // Vertical collision
-        playerPos->y -= minY;
-        playerVel->y = 0;
+        player->position.y -= minY;
+        player->velocity.y = 0;
         if (minY > 0) {
-            *grounded = true; // landed on top
+            player->isGrounded = true; // landed on top
         }
     }
 }
@@ -71,6 +74,5 @@ void handlePlayerPhysics(Player* player, float deltaTime) {
 }
 
 Rectangle getPlayerHitBox(const Player* player) {
-    // printf("Player %f %f %d %d \n", player->position.x, player->position.y, player->size, player->size);
     return (Rectangle){player->position.x, player->position.y, player->size, player->size};
 }
