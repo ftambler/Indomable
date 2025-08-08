@@ -3,8 +3,6 @@
 
 #include "config.h"
 
-// #include <stdio.h>
-
 int getEnumOfType(char* value) {
     if(strcmp(value, "OBJECT") == 0) return OBJECT;
     if(strcmp(value, "SPAWN") == 0) return SPAWN;
@@ -15,6 +13,10 @@ int getEnumOfType(char* value) {
 }
 
 Rectangle getObjectHitBox(const GameObject* gameObject) {
-    // printf("%f %f %d %d \n", gameObject->position.x, gameObject->position.y, gameObject->object.size, gameObject->object.size);
-    return (Rectangle){gameObject->position.x * tileSize, gameObject->position.y * tileSize, gameObject->object.size, gameObject->object.size};
+    return (Rectangle) {
+        gameObject->position.x * tileSize, 
+        gameObject->position.y * tileSize, 
+        gameObject->object.size.x * tileSize, 
+        gameObject->object.size.y * tileSize
+    };
 }
