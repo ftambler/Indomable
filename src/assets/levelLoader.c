@@ -13,10 +13,11 @@ static char* readFileToBuffer(const char* path);
 static Level parseLevelFromJSON(cJSON* level_entry, GameObject** activeCheckpoint);
 static void parseGameObject(cJSON* obj, GameObject* out, GameObject** activeCheckpoint);
 
-static int getIntOrDefault(cJSON* obj, const char* key, int defaultVal);
+static float getIntOrDefault(cJSON* obj, const char* key, float defaultVal);
+static Vector2 getVectorOrDefault(cJSON* obj, const char* key, Vector2 defaultVal);
 
 int loadLevel(int* level_count, Level** levelArray, GameObject** activeCheckpoint) {
-    char* buffer = readFileToBuffer("assets/levels/level1.json");
+    char* buffer = readFileToBuffer("assets/levels/level2.json");
     if (!buffer) return 1;
 
     cJSON* root = cJSON_Parse(buffer);
@@ -93,7 +94,10 @@ static void parseGameObject(cJSON* obj, GameObject* out, GameObject** activeChec
     switch(getEnumOfType(type->valuestring)) {
         case OBJECT:
             out->type = OBJECT;
-            out->object.size = getIntOrDefault(obj, "scale", 1) * tileSize;
+            out->object.scale = getIntOrDefault(obj, "scale", 1);
+            out->object.size = getVectorOrDefault(obj, "size", (Vector2){1, 1});
+
+            // TODO OBJECT TILE TYPE
             out->object.textureId = GRASS;
             break;
 
@@ -113,7 +117,22 @@ static void parseGameObject(cJSON* obj, GameObject* out, GameObject** activeChec
     }
 }
 
-int getIntOrDefault(cJSON* obj, const char* key, int defaultVal) {
+float getIntOrDefault(cJSON* obj, const char* key, float defaultVal) {
     cJSON* item = cJSON_GetObjectItemCaseSensitive(obj, key);
-    return cJSON_IsNumber(item) ? item->valueint : defaultVal;
+    return cJSON_IsNumber(item) ? item->valuedouble : defaultVal;
+}
+
+Vector2 getVectorOrDefault(cJSON* obj, const char* key, Vector2 defaultVal) {
+    if (!obj || !key) return defaultVal;
+
+    cJSON* vectorObj = cJSON_GetObjectItemCaseSensitive(obj, key);
+    if (cJSON_IsObject(vectorObj)) {
+        cJSON* xVal = cJSON_GetObjectItemCaseSensitive(vectorObj, "x");
+        cJSON* yVal = cJSON_GetObjectItemCaseSensitive(vectorObj, "y");
+
+        if (cJSON_IsNumber(xVal)) defaultVal.x = xVal->valueint;
+        if (cJSON_IsNumber(yVal)) defaultVal.y = yVal->valueint;
+    }
+
+    return defaultVal;
 }
