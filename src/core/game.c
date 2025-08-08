@@ -12,6 +12,7 @@
 #include "player.h"
 #include "gameObject.h"
 #include "config.h"
+#define PAUSE KEY_P
 
 // Level
 Level* levelArray;
@@ -73,16 +74,18 @@ void updateGame(float deltaTime) {
     updateCamera(&camera, player.position);
 
     // GameObject Collisions
+    Rectangle playerHitbox = getPlayerHitBox(&player);
     for(int i = 0; i < levelArray[currentLevel].objectCount; i++) {
         switch (roomObjects[i].type) {
             case OBJECT:
-            // if(checkSqSqCollision(player.position, player.size, roomObjects[i].position, tileSize))
-                if(CheckCollisionRecs(getPlayerHitBox(&player), getObjectHitBox(&roomObjects[i])))
-                    handlePlayerCollision(&player.position, &player.velocity, player.size, &player.isGrounded, roomObjects[i].position, tileSize);
+                Rectangle objectHitbox = getObjectHitBox(&roomObjects[i]);
+                if(CheckCollisionRecs(playerHitbox, objectHitbox))
+                    handlePlayerCollision(&player, objectHitbox);
                 break;
                 
             case CHECKPOINT:
-                if(checkSqSqCollision(player.position, player.size, roomObjects[i].position, tileSize) && !roomObjects[i].checkpoint.isActive) {
+                Rectangle checkpointHitbox = getNonObjectHitBox(&roomObjects[i]);
+                if(CheckCollisionRecs(playerHitbox, checkpointHitbox) && !roomObjects[i].checkpoint.isActive) {
                     setCheckpointInactive(&activeCheckpoint->checkpoint);
                     activeCheckpoint = &roomObjects[i];
                     setCheckpointActive(&activeCheckpoint->checkpoint);
