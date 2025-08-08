@@ -18,3 +18,4 @@ typedef struct {
 int getEnumOfType(char* value);
 
 Rectangle getObjectHitBox(const GameObject* gameObject);
+Rectangle getNonObjectHitBox(const GameObject* gameObject);

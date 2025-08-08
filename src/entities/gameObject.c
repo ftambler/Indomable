@@ -20,3 +20,12 @@ Rectangle getObjectHitBox(const GameObject* gameObject) {
         gameObject->object.size.y * tileSize
     };
 }
+
+Rectangle getNonObjectHitBox(const GameObject* gameObject) {
+    return (Rectangle) {
+        gameObject->position.x * tileSize, 
+        gameObject->position.y * tileSize, 
+        tileSize, 
+        tileSize
+    };
+} 
